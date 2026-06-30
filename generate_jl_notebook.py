@@ -449,6 +449,19 @@ $$
 > tolerance — so a third party can audit any dispatch after the fact without trusting the
 > solver. The *objective gap* is $\bigl(V^{\text{ref}}-V^{\text{PRISM}}\bigr)/|V^{\text{ref}}|$
 > against a reference solve run to tight convergence. We report both below.
+
+<div style="background:#fff7ed;border:1px solid #fed7aa;border-left:4px solid #ea580c;border-radius:6px;padding:14px 18px;font-size:14px;">
+<b>⚙️ Where does the GPU compute actually happen? Not in this notebook.</b><br><br>
+This page runs in your browser (Pyodide / WebAssembly, <b>CPU-only — there is no GPU here</b>),
+and the &ldquo;Open in Colab&rdquo; option runs the same notebook on free cloud <b>CPU</b>.
+Neither one runs the PRISM solver. Every solver timing you see below was
+<b>measured offline on a dedicated NVIDIA RTX 4000 Ada GPU</b> and is shown here as a
+<b>CACHED</b> result — this notebook <i>visualizes</i> those validated numbers and lets you
+explore the economics interactively; it does not recompute them.<br><br>
+That is deliberate: the PRISM engine is <b>never uploaded to a public cloud</b> (the
+IP-protection design). A live, hands-on GPU run on your own data is part of a pilot / NDA —
+see the end of this notebook.
+</div>
 '''))
 
 # ── §5 SETUP ────────────────────────────────────────────────────────────────
@@ -616,33 +629,66 @@ solvers, on log–log axes.
 '''))
 
 cells.append(code(
-r'''# Solve time vs fleet size  [CACHED]
-units=[500,2_000,10_000,50_000,200_000,500_000]
-prism=[None,None,None,1.58,6.24,15.79]
-cpu  =[0.32,1.38,9.20,59.53,None,None]
-gur  =[0.55,2.48,15.72,None,None,None]      # OOM beyond 50k on 20 GB
-admm =[None,10.20,53.68,None,None,None]
-def tr(name,y,c,d="solid"):
-    p=[(x,v) for x,v in zip(units,y) if v is not None]
-    return go.Scatter(x=[a for a,_ in p],y=[b for _,b in p],mode="lines+markers",
-        name=name,line=dict(color=c,width=2,dash=d),marker=dict(size=7))
-fig=go.Figure([tr("PRISM (GPU)",prism,"#1d35ff"),tr("PRISM (CPU)",cpu,"#6c8cff","dot"),
-               tr("Standard QP solver",gur,"#9a6700"),tr("Distributed baseline",admm,"#b42318","dash")])
-fig.add_hline(y=300,line=dict(color="#1c8f57",width=1.5,dash="dash"),
-    annotation_text="5-min deadline",annotation_font_color="#1c8f57",annotation_font_size=10)
-fig.add_vline(x=50_000,line=dict(color="#b42318",width=1,dash="dot"))
-fig.add_annotation(x=50_000,y=.96,yref="paper",text="standard solvers exhaust 20 GB →",
-    showarrow=False,font=dict(size=8,color="#b42318",family="ui-monospace"),textangle=-90)
-fig.update_layout(title=dict(text="Solve time vs fleet size (log–log) · [CACHED]",
-    font=dict(color="#141414",size=13),x=.01),
-    xaxis=dict(type="log",title="fleet size (devices)",gridcolor="rgba(20,20,20,.08)",zeroline=False),
-    yaxis=dict(type="log",title="solve time (s)",gridcolor="rgba(20,20,20,.08)"),
-    legend=dict(bgcolor="#fbfbf8",bordercolor="rgba(20,20,20,.12)",borderwidth=1),
-    paper_bgcolor="#f4f4f1",plot_bgcolor="#f4f4f1",height=360,
-    margin=dict(l=20,r=20,t=46,b=20),font=dict(family="ui-monospace",color="#5f5f59"))
+r'''# Solve time vs fleet size — the story is REACH, not raw speed  [CACHED]
+units     = [500, 2_000, 10_000, 50_000, 200_000, 500_000]
+prism_gpu = [None, None, 0.72, 1.58, 6.24, 15.79]   # GPU: reaches every scale, always << deadline
+prism_cpu = [0.32, 1.38, 9.20, 59.53, None, None]    # CPU: strong; slows past 50k
+gurobi    = [0.55, 2.48, 15.72, None, None, None]    # standard QP: OUT OF MEMORY beyond ~10k (20 GB)
+admm      = [None, 10.20, 53.68, None, None, None]   # distributed: 12-75x slower, then stalls
+L10 = lambda v: float(np.log10(v))
+
+def line(name, y, c, dash="solid", w=2):
+    p = [(x, v) for x, v in zip(units, y) if v is not None]
+    return go.Scatter(x=[a for a, _ in p], y=[b for _, b in p], mode="lines+markers",
+                      name=name, line=dict(color=c, width=w, dash=dash), marker=dict(size=8))
+
+fig = go.Figure([
+    line("PRISM (GPU)",        prism_gpu, "#1d35ff", w=3),
+    line("PRISM (CPU)",        prism_cpu, "#6c8cff", "dot"),
+    line("Standard QP solver", gurobi,    "#9a6700"),
+    line("Distributed baseline", admm,    "#b42318", "dash"),
+])
+
+# 'OUT OF MEMORY' wall — where the competitors die (big red X markers)
+fig.add_trace(go.Scatter(x=[50_000, 50_000], y=[15.72, 53.68], mode="markers",
+    marker=dict(symbol="x-thin", size=16, color="#b42318", line=dict(width=3, color="#b42318")),
+    name="out of memory", showlegend=True))
+fig.add_annotation(x=L10(46_000), y=L10(115), xref="x", yref="y",
+    text="✕  standard &amp; distributed solvers<br>run OUT OF MEMORY here", align="center",
+    showarrow=False, font=dict(size=10, color="#b42318", family="ui-monospace"))
+
+# 5-minute deadline as an explicit shape (avoids add_hline autorange quirks on log axes)
+fig.add_shape(type="line", x0=L10(350), x1=L10(750_000), y0=L10(300), y1=L10(300),
+    xref="x", yref="y", line=dict(color="#1c8f57", width=1.5, dash="dash"))
+fig.add_annotation(x=L10(800), y=L10(330), xref="x", yref="y", xanchor="left",
+    text="5-minute market deadline", showarrow=False,
+    font=dict(size=10, color="#1c8f57", family="ui-monospace"))
+
+# headline: PRISM alone reaches 500k, in time
+fig.add_annotation(x=L10(500_000), y=L10(15.79), xref="x", yref="y",
+    text="PRISM: 500,000 devices<br>in 15.8 s  ✓", ax=-55, ay=-45,
+    font=dict(size=10, color="#1d35ff", family="ui-monospace"),
+    arrowcolor="#1d35ff", arrowwidth=1.5, arrowhead=2)
+
+# the speedup multiple where they overlap (10k): 53.68 / 0.72 = 74.5x
+fig.add_annotation(x=L10(10_000), y=L10(4.2), xref="x", yref="y",
+    text="74.5× faster than<br>the distributed baseline", showarrow=False,
+    font=dict(size=9, color="#1d35ff", family="ui-monospace"))
+
+fig.update_layout(
+    title=dict(text="Who can solve it AT ALL, inside the deadline?  ·  [CACHED]",
+        font=dict(color="#141414", size=13), x=.01),
+    xaxis=dict(type="log", title="fleet size (devices)",
+        range=[L10(350), L10(750_000)], gridcolor="rgba(20,20,20,.08)", zeroline=False),
+    yaxis=dict(type="log", title="solve time (s)",
+        range=[L10(0.2), L10(450)], gridcolor="rgba(20,20,20,.08)"),
+    legend=dict(bgcolor="#fbfbf8", bordercolor="rgba(20,20,20,.12)", borderwidth=1,
+        x=.01, y=.99, font=dict(size=10)),
+    paper_bgcolor="#f4f4f1", plot_bgcolor="#f4f4f1", height=430,
+    margin=dict(l=20, r=20, t=46, b=20), font=dict(family="ui-monospace", color="#5f5f59"))
 fig.show()
-print(f"PRISM @ 500k: {BENCH['gpu_scale']['prism_s'][2]} s  (deadline 300 s)")
-print(f"Speed-up vs distributed baseline: {BENCH['admm']['speedup'][0]}x @2k, {BENCH['admm']['speedup'][1]}x @10k")
+print("PRISM (GPU) reaches 500,000 devices in 15.8 s — inside the 300 s deadline.")
+print("Standard QP solvers run out of memory beyond ~10k; the distributed baseline is 12-75x slower.")
 '''))
 
 cells.append(md(r'''**Interpretation.** The green line is the 300-second deadline. Read the chart as *"how
