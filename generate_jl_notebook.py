@@ -30,7 +30,7 @@ cells = []
 #  FRONT MATTER
 # ════════════════════════════════════════════════════════════════════════════
 cells.append(md(r'''<div style="position:relative;border-radius:18px;overflow:hidden;background:linear-gradient(135deg,#0a1224 0%,#0c1d42 55%,#10294f 100%);margin:0 0 14px;">
-  <img src="https://asymmetrycomputing.com/assets/vpp-hero.jpg" alt=""
+  <img src="https://asymmetrycomputing.com/assets/nb-hero.jpg" alt=""
        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.40"
        onerror="this.style.display='none'">
   <div style="position:relative;padding:40px 38px;color:#fff;">
@@ -118,10 +118,10 @@ rooftop solar, smart water heaters, industrial flexible loads — and operates t
 they were one large, dispatchable power plant.
 
 <figure style="margin:20px 0;border-radius:14px;overflow:hidden;border:1px solid rgba(20,20,20,.1);box-shadow:0 6px 20px rgba(20,20,20,.06);">
-<img src="https://asymmetrycomputing.com/assets/vpp-feeder.jpg" alt="A neighbourhood distribution feeder"
+<img src="https://asymmetrycomputing.com/assets/nb-01-decide.jpg" alt="A suburban driveway with rooftop solar, a home battery and a charging electric car"
  style="display:block;width:100%;height:300px;object-fit:cover;" onerror="this.closest('figure').style.display='none'">
 <figcaption style="font:500 12px/1.5 ui-monospace,monospace;color:#5f5f59;padding:9px 15px;background:#f6f8fa;border-top:1px solid rgba(20,20,20,.08);">
-Every home on this street shares <b style="color:#141414">one feeder</b> back to the grid. That shared wire is the constraint that makes coordinating the devices worth money.
+<b style="color:#141414">One node</b> the operator multiplies by 500,000: rooftop solar, a home battery, an EV. PRISM makes this charge-or-discharge call for every device, every five minutes.
 </figcaption>
 </figure>
 
@@ -159,6 +159,14 @@ Two facts make this hard, and they are the whole story:
 
 # ── §2 THE PROBLEM ──────────────────────────────────────────────────────────
 cells.append(md(r'''<a id="2"></a>
+<figure style="margin:4px 0 18px;border-radius:14px;overflow:hidden;border:1px solid rgba(20,20,20,.1);box-shadow:0 6px 20px rgba(20,20,20,.06);">
+<img src="https://asymmetrycomputing.com/assets/nb-02-problem.jpg" alt="An engineer's notebook, calipers and a battery cell on a desk"
+ style="display:block;width:100%;height:150px;object-fit:cover;" onerror="this.closest('figure').style.display='none'">
+<figcaption style="font:500 12px/1.5 ui-monospace,monospace;color:#5f5f59;padding:9px 15px;background:#f6f8fa;border-top:1px solid rgba(20,20,20,.08);">
+The problem written out in full — every variable, objective and constraint below is standard, public textbook formulation.
+</figcaption>
+</figure>
+
 ## 2 · The optimization problem, stated in full
 
 Here we write down the entire problem. None of this mathematics is proprietary — it is the
@@ -355,6 +363,14 @@ print("✓ Setup complete — libraries, benchmark data and theme loaded. Now Ru
 
 # ── §3 THE DEADLINE ─────────────────────────────────────────────────────────
 cells.append(md(r'''<a id="3"></a>
+<figure style="margin:4px 0 18px;border-radius:14px;overflow:hidden;border:1px solid rgba(20,20,20,.1);box-shadow:0 6px 20px rgba(20,20,20,.06);">
+<img src="https://asymmetrycomputing.com/assets/nb-03-deadline.jpg" alt="An analogue wall clock beside a utility control panel"
+ style="display:block;width:100%;height:150px;object-fit:cover;" onerror="this.closest('figure').style.display='none'">
+<figcaption style="font:500 12px/1.5 ui-monospace,monospace;color:#5f5f59;padding:9px 15px;background:#f6f8fa;border-top:1px solid rgba(20,20,20,.08);">
+A hard clock: every 300&nbsp;seconds a new price arrives, and the dispatch must already be in. A plan that lands late is worth nothing.
+</figcaption>
+</figure>
+
 ## 3 · The deadline — why this is a *real-time* problem
 
 Wholesale electricity markets clear on a fixed clock. In a 5-minute real-time market, a new
@@ -412,6 +428,14 @@ on **288 of 288** cycles — a full day with zero misses.
 
 # ── §4 METHODS ──────────────────────────────────────────────────────────────
 cells.append(md(r'''<a id="4"></a>
+<figure style="margin:4px 0 18px;border-radius:14px;overflow:hidden;border:1px solid rgba(20,20,20,.1);box-shadow:0 6px 20px rgba(20,20,20,.06);">
+<img src="https://asymmetrycomputing.com/assets/nb-04-methods.jpg" alt="A sealed matte-black equipment enclosure with cable glands and a status LED"
+ style="display:block;width:100%;height:150px;object-fit:cover;" onerror="this.closest('figure').style.display='none'">
+<figcaption style="font:500 12px/1.5 ui-monospace,monospace;color:#5f5f59;padding:9px 15px;background:#f6f8fa;border-top:1px solid rgba(20,20,20,.08);">
+PRISM as a sealed box with a contract: stated inputs in, certified dispatch out — the mechanism inside stays closed.
+</figcaption>
+</figure>
+
 ## 4 · Methods — PRISM as a black box with a contract
 
 We evaluate PRISM strictly through its **external contract**. This is both an honest
@@ -459,6 +483,14 @@ see the end of this notebook.
 
 # ── §5 SETUP ────────────────────────────────────────────────────────────────
 cells.append(md(r'''<a id="5"></a>
+<figure style="margin:4px 0 18px;border-radius:14px;overflow:hidden;border:1px solid rgba(20,20,20,.1);box-shadow:0 6px 20px rgba(20,20,20,.06);">
+<img src="https://asymmetrycomputing.com/assets/nb-05-setup.jpg" alt="A data-centre GPU accelerator card on a brushed-aluminium bench"
+ style="display:block;width:100%;height:150px;object-fit:cover;" onerror="this.closest('figure').style.display='none'">
+<figcaption style="font:500 12px/1.5 ui-monospace,monospace;color:#5f5f59;padding:9px 15px;background:#f6f8fa;border-top:1px solid rgba(20,20,20,.08);">
+The compute behind the cached runs: a single workstation-class NVIDIA RTX&nbsp;4000 Ada GPU — not a data-centre cluster.
+</figcaption>
+</figure>
+
 ## 5 · Experimental setup
 
 **Price data.** Real **NYISO** (New York ISO) real-time market prices, January 2024.
@@ -540,10 +572,10 @@ cells.append(md(r'''<a id="6"></a>
 ## 6 · Results
 
 <figure style="margin:14px 0 20px;border-radius:14px;overflow:hidden;border:1px solid rgba(20,20,20,.1);box-shadow:0 6px 20px rgba(20,20,20,.06);">
-<img src="https://asymmetrycomputing.com/assets/vpp-bess.jpg" alt="Grid-scale battery storage"
+<img src="https://asymmetrycomputing.com/assets/nb-06-results.jpg" alt="Aerial view of a large grid-scale battery-storage farm"
  style="display:block;width:100%;height:300px;object-fit:cover;" onerror="this.closest('figure').style.display='none'">
 <figcaption style="font:500 12px/1.5 ui-monospace,monospace;color:#5f5f59;padding:9px 15px;background:#f6f8fa;border-top:1px solid rgba(20,20,20,.08);">
-The assets being coordinated: grid-scale battery enclosures. At 500,000 such devices, the dispatch problem is what PRISM solves in 15.8&nbsp;s.
+Coordination at survey scale: a battery farm of hundreds of identical enclosures. At 500,000 devices, this is the dispatch PRISM solves in 15.8&nbsp;s.
 </figcaption>
 </figure>
 
@@ -760,6 +792,14 @@ evidence that the engine is **operational**, not merely fast on a single instanc
 
 # ── §7 INTERACTIVE ──────────────────────────────────────────────────────────
 cells.append(md(r'''<a id="7"></a>
+<figure style="margin:4px 0 18px;border-radius:14px;overflow:hidden;border:1px solid rgba(20,20,20,.1);box-shadow:0 6px 20px rgba(20,20,20,.06);">
+<img src="https://asymmetrycomputing.com/assets/nb-07-explore.jpg" alt="A laptop open on a wooden desk by a window in soft morning light"
+ style="display:block;width:100%;height:150px;object-fit:cover;" onerror="this.closest('figure').style.display='none'">
+<figcaption style="font:500 12px/1.5 ui-monospace,monospace;color:#5f5f59;padding:9px 15px;background:#f6f8fa;border-top:1px solid rgba(20,20,20,.08);">
+Your turn — drive the sliders below; everything recomputes in your browser from the cached benchmark, nothing is uploaded.
+</figcaption>
+</figure>
+
 ## 7 · Interactive exploration — try your own scenario
 
 Now make it yours. Move the sliders to your fleet size, your feeder tightness, your battery
@@ -883,6 +923,14 @@ measurement.
 
 # ── §8 DISCUSSION ───────────────────────────────────────────────────────────
 cells.append(md(r'''<a id="8"></a>
+<figure style="margin:4px 0 18px;border-radius:14px;overflow:hidden;border:1px solid rgba(20,20,20,.1);box-shadow:0 6px 20px rgba(20,20,20,.06);">
+<img src="https://asymmetrycomputing.com/assets/nb-08-honesty.jpg" alt="A weathered galvanised junction box with rust streaks on grid hardware"
+ style="display:block;width:100%;height:150px;object-fit:cover;" onerror="this.closest('figure').style.display='none'">
+<figcaption style="font:500 12px/1.5 ui-monospace,monospace;color:#5f5f59;padding:9px 15px;background:#f6f8fa;border-top:1px solid rgba(20,20,20,.08);">
+We show the warts: what the evidence supports, what it does not claim, and the threats to validity.
+</figcaption>
+</figure>
+
 ## 8 · Discussion, limitations, and honesty
 
 We hold this work to the standard we would want a reviewer to apply.
@@ -914,6 +962,14 @@ in a paid pilot, which is why pilots exist.
 
 # ── §9 REPRO + IP ───────────────────────────────────────────────────────────
 cells.append(md(r'''<a id="9"></a>
+<figure style="margin:4px 0 18px;border-radius:14px;overflow:hidden;border:1px solid rgba(20,20,20,.1);box-shadow:0 6px 20px rgba(20,20,20,.06);">
+<img src="https://asymmetrycomputing.com/assets/nb-09-repro.jpg" alt="Out-of-focus rows of code on a developer's screen with warm bokeh"
+ style="display:block;width:100%;height:150px;object-fit:cover;" onerror="this.closest('figure').style.display='none'">
+<figcaption style="font:500 12px/1.5 ui-monospace,monospace;color:#5f5f59;padding:9px 15px;background:#f6f8fa;border-top:1px solid rgba(20,20,20,.08);">
+Run it again, get the same thing — public data, a seeded fleet, and a clear line on what stays under NDA.
+</figcaption>
+</figure>
+
 ## 9 · Reproducibility, intellectual property, and references
 
 **Data availability.** NYISO real-time prices are public
