@@ -30,7 +30,13 @@ jobs:
             jupyterlite-core==0.4.1 \
             jupyterlite-pyodide-kernel==0.4.1 \
             jupyterlab~=4.2 \
-            notebook
+            notebook \
+            ipywidgets \
+            plotly
+          # ipywidgets + plotly are installed so their JupyterLab frontend
+          # extensions (@jupyter-widgets/jupyterlab-manager, jupyterlab-plotly)
+          # are bundled into the static build — required for widgets/charts to
+          # render in-browser. Without them the notebook errors out.
 
       - name: Build JupyterLite site
         run: |

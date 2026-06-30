@@ -287,6 +287,10 @@ import warnings; warnings.filterwarnings("ignore")
 import numpy as np, pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import plotly.io as pio
+pio.renderers.default = "plotly_mimetype+notebook_connected"  # render via the bundled
+                                        # jupyterlab-plotly extension, with a CDN HTML
+                                        # fallback (Colab / static); compact saved outputs
 import ipywidgets as widgets
 from IPython.display import display, HTML, clear_output
 
