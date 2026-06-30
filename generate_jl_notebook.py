@@ -13,6 +13,22 @@ Design goals
 * Strict IP safety: the optimisation *problem* is standard textbook formulation;
   the PRISM *solver* is a black box (no algorithm, no internal parameters).
 * All numbers labelled CACHED / SYNTHETIC / ASSUMPTION.
+
+IMPORTANT — this script alone is NOT the full build step.
+------------------------------------------------------------------------------
+Every cell below is written with outputs=[] / execution_count=None: this script
+only emits *source*. The front matter promises visitors "the charts below are
+already filled in from a saved run" — that promise is kept by a SEPARATE bake
+step that actually executes the notebook and writes real outputs back into the
+same file:
+
+    python3 generate_jl_notebook.py
+    ./bake_outputs.sh          # executes content/PRISM_VPP_Demo.ipynb in place
+
+Skipping bake_outputs.sh ships a notebook with no charts until a visitor
+successfully runs every cell themselves (fragile — see the §2.5 setup cell's
+piplite install). ALWAYS run bake_outputs.sh after regenerating, before
+committing content/PRISM_VPP_Demo.ipynb.
 """
 import json, uuid, pathlib
 
@@ -71,7 +87,10 @@ cells.append(md(r'''<div style="position:relative;border-radius:18px;overflow:hi
   <span style="font-size:20px;">▶</span>
   <div><b>To run it:</b> click <b>Run&nbsp;▸&nbsp;Run&nbsp;All&nbsp;Cells</b> at the top (or the ⏩ button).
   The charts below are already filled in from a saved run — scroll down, then open the
-  <b>“Try your own scenario”</b> panel to move the sliders.</div>
+  <b>“Try your own scenario”</b> panel to move the sliders.
+  <br><span style="color:#5f5f59;font-size:13px;">If a cell shows a red error, it's almost always the
+  one-time package install in §2.5 — scroll to <b>“2.5 · Setup”</b>, re-run that single cell, then
+  Run All Cells again.</span></div>
 </div>
 '''))
 
@@ -300,9 +319,25 @@ r'''# ╔═══════════════════════�
 # ║  ▶  RUN THIS CELL FIRST  —  libraries · benchmark data · visual theme       ║
 # ║     Works in JupyterLite (browser) and Google Colab. ~10-20 s on first run. ║
 # ╚══════════════════════════════════════════════════════════════════════════╝
-%pip install -q plotly pandas ipywidgets
+import sys, warnings
+warnings.filterwarnings("ignore")
 
-import warnings; warnings.filterwarnings("ignore")
+# Install in whichever environment we're in. Pyodide (JupyterLite) needs piplite,
+# not pip — %pip/!pip silently no-op or error there. Each package installs
+# independently so one failure (e.g. a flaky CDN fetch) can't take the others down.
+if sys.platform == "emscripten":
+    import piplite
+    for _pkg in ("plotly", "ipywidgets", "pandas"):
+        try:
+            await piplite.install(_pkg)
+        except Exception as _e:
+            print(f"⚠ could not install {_pkg} ({_e}) — related cells below may not render. "
+                  f"Re-run this cell — it's usually a transient network blip.")
+else:
+    import subprocess
+    subprocess.run([sys.executable, "-m", "pip", "install", "-q",
+                     "plotly", "pandas", "ipywidgets"], check=False)
+
 import numpy as np, pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
