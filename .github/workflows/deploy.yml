@@ -1,0 +1,55 @@
+name: Build and Deploy JupyterLite
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install JupyterLite
+        run: |
+          pip install \
+            jupyterlite-core==0.4.1 \
+            jupyterlite-pyodide-kernel==0.4.1 \
+            jupyterlab~=4.2 \
+            notebook
+
+      - name: Build JupyterLite site
+        run: |
+          jupyter lite build \
+            --contents content \
+            --output-dir _site \
+            --lite-dir .
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
