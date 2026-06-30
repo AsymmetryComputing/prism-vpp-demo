@@ -606,7 +606,7 @@ home battery. The fleet here totals on the order of **100+ MW** of controllable 
 cells.append(md(r'''<a id="6"></a>
 ## 6 · Results
 
-<figure style="margin:14px 0 20px;border-radius:14px;overflow:hidden;border:1px solid rgba(20,20,20,.1);box-shadow:0 6px 20px rgba(20,20,20,.06);">
+<figure style="margin:4px 0 18px;border-radius:14px;overflow:hidden;border:1px solid rgba(20,20,20,.1);box-shadow:0 6px 20px rgba(20,20,20,.06);">
 <img src="https://asymmetrycomputing.com/assets/nb-06-results.jpg" alt="Aerial view of a large grid-scale battery-storage farm"
  style="display:block;width:100%;height:300px;object-fit:cover;" onerror="this.closest('figure').style.display='none'">
 <figcaption style="font:500 12px/1.5 ui-monospace,monospace;color:#5f5f59;padding:9px 15px;background:#f6f8fa;border-top:1px solid rgba(20,20,20,.08);">
@@ -616,7 +616,8 @@ Coordination at survey scale: a battery farm of hundreds of identical enclosures
 
 We report three results in order of importance: the **economic** question (is coordination
 worth anything?), the **scale** question (can it be solved at all?), and the **operational**
-question (can it run continuously?).
+question (can it run continuously?) — then translate the headline economic result into a
+dollar figure in §6.4.
 '''))
 
 # 6.1 coordination
@@ -825,6 +826,54 @@ settles to **181.7 s** at half a million devices, leaving comfortable headroom u
 evidence that the engine is **operational**, not merely fast on a single instance.
 '''))
 
+# ── §6.4 economics (kept in results spirit) ─────────────────────────────────
+cells.append(md(r'''<a id="6-4"></a>
+### 6.4 · From premium to revenue — a transparent business case
+
+Finally we translate the coordination premium into money, being explicit about which inputs
+are **measured** and which are **assumed**. The base arbitrage rate
+($\$61{,}140/\text{MW}/\text{yr}$) is computed from real NYISO real-time prices (**CACHED**).
+The *software-capture rate* — what fraction of the value a vendor could license — is an
+**ASSUMPTION**, varied across three scenarios.
+
+$$
+\text{ARR} \;=\; \underbrace{(\$/\text{MW}/\text{yr})\times \text{MW}}_{\text{base arbitrage [CACHED]}}
+\;\times\; \underbrace{\text{premium}}_{\text{[CACHED, §6.1]}}
+\;\times\; \underbrace{\text{capture rate}}_{\text{[ASSUMPTION]}} .
+$$
+'''))
+
+cells.append(code(
+r'''# Transparent scenario economics  [CACHED arbitrage · ASSUMPTION capture]
+scen=[("Conservative",2,500,12.75,.05),("Base",5,800,19.03,.10),("Aggressive",10,1000,28.09,.15)]
+body=""
+for name,fleets,mw,up,cap in scen:
+    arb=BENCH["economics"]["per_mw_yr"]*mw*fleets/1e6; inc=arb*up/100; arr=inc*cap
+    body+=(f'<tr><td style="font-weight:600">{name}</td><td>{fleets}</td><td>{mw:,} MW</td>'
+           f'<td class="grn">${arb:.1f}M</td><td>+{up:.2f}%</td><td class="grn">${inc:.1f}M</td>'
+           f'<td>{cap*100:.0f}%</td><td class="blu">${arr:.1f}M</td></tr>')
+display(HTML(
+ '<div class="pcard"><div class="stitle">Scenario economics &nbsp;'
+ '<span class="bdg bdg-cached">arbitrage CACHED</span>'
+ '<span class="bdg bdg-assum">capture ASSUMPTION</span></div>'
+ '<table class="ptbl"><thead><tr><th>Scenario</th><th>Fleets</th><th>MW each</th>'
+ '<th>Base arb.</th><th>Premium</th><th>PRISM increment</th><th>Capture</th><th>Est. ARR</th>'
+ '</tr></thead><tbody>'+body+'</tbody></table>'
+ '<p style="font-family:ui-monospace;font-size:11px;color:#5f5f59;margin-top:10px">'
+ 'Base arbitrage $61,140/MW/yr [CACHED · NYISO RT · η=0.85 · 1.5 cyc/day]. '
+ 'Capture rate = licence as % of PRISM increment [ASSUMPTION]. '
+ 'The defensible engineering figure is the <b>$16M/yr incremental coordination value</b> on a '
+ '1,000 MW fleet; ARR depends on commercial terms.</p></div>'))
+'''))
+
+cells.append(md(r'''**Interpretation.** The honest headline is the **incremental coordination value** —
+about **\$16 M/yr** on a 1,000 MW fleet at the measured premium — because that figure rests
+only on measured quantities (real prices × measured premium). The **ARR** column multiplies
+by an assumed capture rate and is therefore a *planning* number, not a measured one. We keep
+the two visually separated on purpose: never let an assumption borrow the credibility of a
+measurement.
+'''))
+
 # ── §7 INTERACTIVE ──────────────────────────────────────────────────────────
 cells.append(md(r'''<a id="7"></a>
 <figure style="margin:4px 0 18px;border-radius:14px;overflow:hidden;border:1px solid rgba(20,20,20,.1);box-shadow:0 6px 20px rgba(20,20,20,.06);">
@@ -907,53 +956,6 @@ cells.append(md(r'''**Try these.** Set the feeder cap to **100 %** — the premi
 bottleneck, no coordination value), exactly as in §6.1. Now drag it to **30 %** and watch the
 premium climb toward **28 %**. Push the fleet to **500,000** and the solve time rises to
 **15.79 s** — still comfortably inside the window.
-'''))
-
-# ── §6.4 economics (kept in results spirit) ─────────────────────────────────
-cells.append(md(r'''### 6.4 · From premium to revenue — a transparent business case
-
-Finally we translate the coordination premium into money, being explicit about which inputs
-are **measured** and which are **assumed**. The base arbitrage rate
-($\$61{,}140/\text{MW}/\text{yr}$) is computed from real NYISO real-time prices (**CACHED**).
-The *software-capture rate* — what fraction of the value a vendor could license — is an
-**ASSUMPTION**, varied across three scenarios.
-
-$$
-\text{ARR} \;=\; \underbrace{(\$/\text{MW}/\text{yr})\times \text{MW}}_{\text{base arbitrage [CACHED]}}
-\;\times\; \underbrace{\text{premium}}_{\text{[CACHED, §6.1]}}
-\;\times\; \underbrace{\text{capture rate}}_{\text{[ASSUMPTION]}} .
-$$
-'''))
-
-cells.append(code(
-r'''# Transparent scenario economics  [CACHED arbitrage · ASSUMPTION capture]
-scen=[("Conservative",2,500,12.75,.05),("Base",5,800,19.03,.10),("Aggressive",10,1000,28.09,.15)]
-body=""
-for name,fleets,mw,up,cap in scen:
-    arb=BENCH["economics"]["per_mw_yr"]*mw*fleets/1e6; inc=arb*up/100; arr=inc*cap
-    body+=(f'<tr><td style="font-weight:600">{name}</td><td>{fleets}</td><td>{mw:,} MW</td>'
-           f'<td class="grn">${arb:.1f}M</td><td>+{up:.2f}%</td><td class="grn">${inc:.1f}M</td>'
-           f'<td>{cap*100:.0f}%</td><td class="blu">${arr:.1f}M</td></tr>')
-display(HTML(
- '<div class="pcard"><div class="stitle">Scenario economics &nbsp;'
- '<span class="bdg bdg-cached">arbitrage CACHED</span>'
- '<span class="bdg bdg-assum">capture ASSUMPTION</span></div>'
- '<table class="ptbl"><thead><tr><th>Scenario</th><th>Fleets</th><th>MW each</th>'
- '<th>Base arb.</th><th>Premium</th><th>PRISM increment</th><th>Capture</th><th>Est. ARR</th>'
- '</tr></thead><tbody>'+body+'</tbody></table>'
- '<p style="font-family:ui-monospace;font-size:11px;color:#5f5f59;margin-top:10px">'
- 'Base arbitrage $61,140/MW/yr [CACHED · NYISO RT · η=0.85 · 1.5 cyc/day]. '
- 'Capture rate = licence as % of PRISM increment [ASSUMPTION]. '
- 'The defensible engineering figure is the <b>$16M/yr incremental coordination value</b> on a '
- '1,000 MW fleet; ARR depends on commercial terms.</p></div>'))
-'''))
-
-cells.append(md(r'''**Interpretation.** The honest headline is the **incremental coordination value** —
-about **\$16 M/yr** on a 1,000 MW fleet at the measured premium — because that figure rests
-only on measured quantities (real prices × measured premium). The **ARR** column multiplies
-by an assumed capture rate and is therefore a *planning* number, not a measured one. We keep
-the two visually separated on purpose: never let an assumption borrow the credibility of a
-measurement.
 '''))
 
 # ── §8 DISCUSSION ───────────────────────────────────────────────────────────
