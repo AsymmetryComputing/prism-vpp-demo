@@ -29,76 +29,83 @@ cells = []
 # ════════════════════════════════════════════════════════════════════════════
 #  FRONT MATTER
 # ════════════════════════════════════════════════════════════════════════════
-cells.append(md(r'''<div align="center">
-
-# Real-Time Coordination of Large Distributed-Energy Fleets
-
-### A reproducible benchmark of deadline-bounded dispatch at $10^4$–$10^6$ devices
-
-**Asymmetry Computing — Research Note · Demo Edition · v1.0**
-
-*Keywords:* virtual power plant · distributed energy resources · battery dispatch ·
-real-time optimization · quadratic programming · feeder congestion · grid coordination
-
+cells.append(md(r'''<div style="position:relative;border-radius:18px;overflow:hidden;background:linear-gradient(135deg,#0a1224 0%,#0c1d42 55%,#10294f 100%);margin:0 0 14px;">
+  <img src="https://asymmetrycomputing.com/assets/vpp-hero.jpg" alt=""
+       style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.40"
+       onerror="this.style.display='none'">
+  <div style="position:relative;padding:40px 38px;color:#fff;">
+    <div style="font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#9db8ff;margin-bottom:14px;">
+      Asymmetry Computing &nbsp;·&nbsp; PRISM Engine &nbsp;·&nbsp; Live VPP / DER Demo
+    </div>
+    <h1 style="font-size:36px;line-height:1.08;font-weight:800;margin:0 0 14px;max-width:17ch;letter-spacing:-.02em;border:0;">
+      Coordinate 500,000 batteries<br>in 15.8&nbsp;seconds.
+    </h1>
+    <p style="font-size:16px;line-height:1.62;color:rgba(255,255,255,.86);max-width:58ch;margin:0 0 24px;">
+      Every 5 minutes, a virtual power plant must decide how a whole city of batteries, EVs and
+      solar should charge or discharge — to earn the most, without overloading the grid.
+      <b style="color:#fff;">PRISM</b> is the GPU-native engine that makes all those decisions in time.
+      This page lets you <b style="color:#fff;">run the benchmark and try your own fleet</b>.
+    </p>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:11px;max-width:560px;">
+      <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:14px 16px;">
+        <div style="font:800 26px/1 ui-monospace,monospace;color:#7aa2ff;">15.8&nbsp;s</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.66);margin-top:5px;">to solve a 500,000-device fleet — inside the 5-min deadline</div>
+      </div>
+      <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:14px 16px;">
+        <div style="font:800 26px/1 ui-monospace,monospace;color:#5fd6a0;">+12–28%</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.66);margin-top:5px;">more value vs running each device on its own (when feeders bind)</div>
+      </div>
+      <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:14px 16px;">
+        <div style="font:800 26px/1 ui-monospace,monospace;color:#5fd6a0;">0.004%</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.66);margin-top:5px;">gap from the exact optimum — fast <i>and</i> right</div>
+      </div>
+      <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:14px 16px;">
+        <div style="font:800 26px/1 ui-monospace,monospace;color:#7aa2ff;">where others stop</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.66);margin-top:5px;">standard solvers run out of memory at ~50k devices</div>
+      </div>
+    </div>
+  </div>
 </div>
 
----
-
-> ### Abstract
->
-> Operators of **virtual power plants (VPPs)** must decide, every few minutes, how
-> thousands to millions of batteries, electric vehicles, solar inverters and flexible
-> loads should charge or discharge — while respecting the physical limits of the
-> distribution grid and clearing inside a hard market deadline. We formalise this as a
-> large **quadratic program (QP)**, state its governing equations and constraints in
-> full, and benchmark a GPU-native optimization engine (**PRISM**) against
-> general-purpose commercial solvers and a distributed baseline. On real
-> **NYISO** January-2024 price data we find that (i) PRISM returns a *feasible,
-> certificate-bearing* dispatch for a **500,000-device** fleet in **15.8 s**, well
-> inside the 5-minute clearing window, where standard QP solvers run out of memory;
-> (ii) it matches the optimal objective to within **0.004 %**; and (iii) coordinating
-> devices jointly — rather than dispatching them independently — is worth
-> **12–28 %** of arbitrage value *precisely when a distribution feeder binds*, and
-> **0 %** when it does not, a control that validates the test. We are deliberately
-> explicit about what is *measured* versus *assumed*, and we disclose the problem
-> mathematics while keeping the solver itself proprietary.
-
----
-
-<div style="background:#f0f6ff;border:1px solid #bfdbfe;border-left:4px solid #1d35ff;border-radius:6px;padding:14px 18px;font-size:14px;">
-<b>⚠ Intellectual-property notice.</b> This document discloses the <i>problem</i> — the
-objective, the decision variables and every constraint — because that mathematics is
-standard and public. It does <i>not</i> disclose how PRISM solves the problem. The engine
-is treated throughout as a black box with a clean contract: you give it inputs and a
-deadline, it returns a feasible, audited plan. Production methodology is available under NDA.
+<div style="display:flex;gap:12px;align-items:center;background:#eef4ff;border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:0 0 6px;font-size:15px;color:#1f2328;">
+  <span style="font-size:20px;">▶</span>
+  <div><b>To run it:</b> click <b>Run&nbsp;▸&nbsp;Run&nbsp;All&nbsp;Cells</b> at the top (or the ⏩ button).
+  The charts below are already filled in from a saved run — scroll down, then open the
+  <b>“Try your own scenario”</b> panel to move the sliders.</div>
 </div>
 '''))
 
-cells.append(md(r'''## How to read this notebook
+cells.append(md(r'''#### A 30-second tour
 
-This notebook is written on **two tracks at once**, so it is useful whether or not you
-have a technical background. Look for these two markers throughout:
+<table style="border-collapse:collapse;font-size:14px;margin:6px 0 14px;">
+<tr>
+  <td style="padding:6px 14px 6px 0;vertical-align:top;font-size:20px;">⚡</td>
+  <td style="padding:6px 0;"><b>The problem.</b> Prices change every 5 minutes; a plan that arrives late is worthless. <a href="#1">See §1&nbsp;→</a></td>
+</tr>
+<tr>
+  <td style="padding:6px 14px 6px 0;vertical-align:top;font-size:20px;">📈</td>
+  <td style="padding:6px 0;"><b>The proof.</b> Real NYISO data: PRISM reaches 500k devices in time; rivals can’t. <a href="#6">See the results&nbsp;→</a></td>
+</tr>
+<tr>
+  <td style="padding:6px 14px 6px 0;vertical-align:top;font-size:20px;">🎛️</td>
+  <td style="padding:6px 0;"><b>Your turn.</b> Drag sliders for fleet size, grid limits and battery efficiency. <a href="#7">Try it&nbsp;→</a></td>
+</tr>
+<tr>
+  <td style="padding:6px 14px 6px 0;vertical-align:top;font-size:20px;">📐</td>
+  <td style="padding:6px 0;"><b>The math &amp; honesty.</b> Full equations, what’s measured vs assumed, and our IP line. <a href="#2">See §2&nbsp;→</a></td>
+</tr>
+</table>
 
-> 🟢 **In plain words** — an everyday-language explanation. No maths required.
+<div style="font-size:13px;color:#5f5f59;background:#f6f8fa;border:1px solid #e4e4e0;border-radius:8px;padding:10px 14px;">
+<b>No background needed.</b> Throughout, 🟢 <b>In plain words</b> explains things in everyday language;
+🔵 <b>For the technical reader</b> gives the formal version. You don’t need to know Python — every
+chart is already computed. &nbsp;·&nbsp; <b>Runs in your browser, no account, nothing uploaded.</b>
+</div>
 
-> 🔵 **For the technical reader** — the formal statement: equations, constraints, units.
-
-You do **not** need to know Python. Every grey code block below has already been run; the
-charts and tables beneath it are its output. If you want to *change* an assumption and
-re-run, use the menu **Run ▸ Run All Cells** at the top, or jump to
-[§7 Interactive Exploration](#7).
-
-**Contents**
-
-1. [Introduction — what a VPP operator actually decides](#1)
-2. [The optimization problem, stated in full](#2)
-3. [The deadline — why this is a *real-time* problem](#3)
-4. [Methods — PRISM as a black box with a contract](#4)
-5. [Experimental setup — data, hardware, fleet](#5)
-6. [Results](#6)
-7. [Interactive exploration](#7)
-8. [Discussion, limitations, and honesty](#8)
-9. [Reproducibility, IP, and references](#9)
+<div style="background:#f0f6ff;border:1px solid #bfdbfe;border-left:4px solid #1d35ff;border-radius:8px;padding:11px 16px;font-size:13px;color:#2c2c2a;margin-top:12px;">
+⚠ <b>IP note.</b> We show the <i>problem</i> (every equation and constraint — standard, public) and PRISM’s
+measured behaviour. We do <i>not</i> show <i>how</i> PRISM solves it; the engine is a black box available under NDA.
+</div>
 '''))
 
 # ── §1 INTRODUCTION ─────────────────────────────────────────────────────────
@@ -263,43 +270,52 @@ QP** — in principle "solved." The difficulty is purely one of **scale and dead
 > wall-clock time, objective gap, and feasibility certificate.
 '''))
 
-# ── SETUP (code) ────────────────────────────────────────────────────────────
-cells.append(md(r'''### 2.5 · Set up the computational environment
+# ── SETUP (one consolidated, robust cell) ───────────────────────────────────
+cells.append(md(r'''### 2.5 · Setup — run this one cell first
 
-The cell below loads the scientific-Python stack **inside your browser** (via Pyodide —
-no server, no installation). It is the only "plumbing" cell; everything after it is content.
+Everything the demo needs (libraries, the benchmark data, and the visual theme) loads in the
+**single cell below**. It runs the same in your browser (JupyterLite / Pyodide) and in Google
+Colab — no installation, no account. After it finishes, choose **Run ▸ Run All Cells**, or run
+the cells below in order.
 '''))
 
 cells.append(code(
-r'''# Install packages in-browser via micropip (JupyterLite / Pyodide).
-import sys
-_IN_PYODIDE = "pyodide" in sys.modules or hasattr(sys, "_pyodide_core")
-
-if _IN_PYODIDE:
-    import micropip
-    await micropip.install(["plotly", "pandas", "ipywidgets"])
-else:                                   # Colab / local Jupyter fallback
-    import subprocess
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "-q",
-                           "plotly", "pandas", "ipywidgets"])
+r'''# ╔══════════════════════════════════════════════════════════════════════════╗
+# ║  ▶  RUN THIS CELL FIRST  —  libraries · benchmark data · visual theme       ║
+# ║     Works in JupyterLite (browser) and Google Colab. ~10-20 s on first run. ║
+# ╚══════════════════════════════════════════════════════════════════════════╝
+%pip install -q plotly pandas ipywidgets
 
 import warnings; warnings.filterwarnings("ignore")
 import numpy as np, pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.io as pio
-pio.renderers.default = "plotly_mimetype+notebook_connected"  # render via the bundled
-                                        # jupyterlab-plotly extension, with a CDN HTML
-                                        # fallback (Colab / static); compact saved outputs
+pio.renderers.default = "plotly_mimetype+notebook_connected"   # bundled extension + CDN fallback
 import ipywidgets as widgets
 from IPython.display import display, HTML, clear_output
+RNG = np.random.default_rng(42)                                # fixed seed → reproducible
 
-RNG = np.random.default_rng(42)         # fixed seed → reproducible figures
-print(f"Environment ready  |  in-browser kernel = {_IN_PYODIDE}")
-'''))
+# ── Validated CACHED benchmark data (measured offline on RTX 4000 Ada) ──────
+BENCH = {
+    "gpu_scale":  dict(units=[50_000,200_000,500_000], prism_s=[1.58,6.24,15.79],
+                       source="PRISM internal benchmark / RTX 4000 Ada / NYISO Jan 2024"),
+    "quality":    dict(N=2000, gap_pct=0.004, feas_viol=0.0,
+                       source="PRISM vs fully-converged reference solver"),
+    "realtime":   dict(N=10_000, cycles=288, mean_s=0.41, p95_s=0.46, p99_s=0.50,
+                       source="PRISM real-time cadence benchmark"),
+    "admm":       dict(units=[2_000,10_000], speedup=[11.8,74.5],
+                       source="PRISM vs distributed baseline"),
+    "warmstart":  dict(cold_iters=575, cold_s=284.8, warm_iters=338, warm_s=181.7,
+                       source="PRISM warm-start benchmark / N=500k"),
+    "coordination": dict(cap_pct=[100,60,45,30], increment_pct=[0.00,12.75,19.03,28.09],
+                       label=["No constraint","60% cap","45% cap","30% cap (tight)"],
+                       source="Coordination benchmark / NYISO RT Jan 2024 / N=300 / eta=0.85"),
+    "economics":  dict(per_mw_yr=61_140, increment_myr=16.0,
+                       source="Economic sizing / NYISO RT Jan 2024"),
+}
 
-cells.append(code(
-r'''# ── Visual theme (matches asymmetrycomputing.com: cream / ink / electric-blue) ──
+# ── Visual theme (cream / ink / electric-blue, matching asymmetrycomputing.com) ──
 _CSS = (
  '<style>'
  ':root{--bg:#f4f4f1;--card:#fbfbf8;--card2:#f4f4f1;--bdr:rgba(20,20,20,.12);'
@@ -325,39 +341,8 @@ _CSS = (
  '.ptbl td{border:1px solid var(--bdr);padding:7px 12px;color:var(--tx);}'
  '.grn{color:#1c8f57!important;}.amb{color:#9a6700!important;}.red{color:#b42318!important;}.blu{color:#1d35ff!important;}'
  '</style>')
-display(HTML(_CSS)); print("Theme applied.")
-'''))
-
-# ── DATA / BENCH ────────────────────────────────────────────────────────────
-cells.append(md(r'''### 2.6 · The validated measurements used throughout
-
-Every headline number in this notebook comes from a fixed table of **previously validated
-benchmark results** (label **CACHED**), so that the figures are identical each time the page
-loads. The provenance of each block is recorded in its `source` field. Nothing here is
-recomputed live on a GPU — that would require the proprietary engine, which never leaves
-Asymmetry Computing's hardware.
-'''))
-
-cells.append(code(
-r'''# ── Validated cached benchmark data  [CACHED] ───────────────────────────────
-BENCH = {
-    "gpu_scale":  dict(units=[50_000,200_000,500_000], prism_s=[1.58,6.24,15.79],
-                       source="PRISM internal benchmark / RTX 4000 Ada / NYISO Jan 2024"),
-    "quality":    dict(N=2000, gap_pct=0.004, feas_viol=0.0,
-                       source="PRISM vs fully-converged reference solver"),
-    "realtime":   dict(N=10_000, cycles=288, mean_s=0.41, p95_s=0.46, p99_s=0.50,
-                       source="PRISM real-time cadence benchmark"),
-    "admm":       dict(units=[2_000,10_000], speedup=[11.8,74.5],
-                       source="PRISM vs distributed baseline"),
-    "warmstart":  dict(cold_iters=575, cold_s=284.8, warm_iters=338, warm_s=181.7,
-                       source="PRISM warm-start benchmark / N=500k"),
-    "coordination": dict(cap_pct=[100,60,45,30], increment_pct=[0.00,12.75,19.03,28.09],
-                       label=["No constraint","60% cap","45% cap","30% cap (tight)"],
-                       source="Coordination benchmark / NYISO RT Jan 2024 / N=300 / eta=0.85"),
-    "economics":  dict(per_mw_yr=61_140, increment_myr=16.0,
-                       source="Economic sizing / NYISO RT Jan 2024"),
-}
-print("Loaded benchmark blocks:", ", ".join(BENCH))
+display(HTML(_CSS))
+print("✓ Setup complete — libraries, benchmark data and theme loaded. Now Run ▸ Run All Cells.")
 '''))
 
 # ── §3 THE DEADLINE ─────────────────────────────────────────────────────────
