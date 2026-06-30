@@ -1,14 +1,9 @@
 {
   "LiteBuildConfig": {
-    "apps": ["lab", "retro"],
-    "contents": ["content"],
-    "federated_extensions": [],
-    "ignore_sys_prefix": true
+    "apps": ["lab", "notebooks", "tree", "repl"]
   },
   "LabConfig": {
     "appName": "PRISM VPP Demo",
-    "appVersion": "1.0.0",
-    "appUrl": "/lab",
-    "baseUrl": "/"
+    "appVersion": "1.0.0"
   }
 }
