@@ -117,6 +117,14 @@ many small, independently-owned energy devices — home and grid batteries, EV c
 rooftop solar, smart water heaters, industrial flexible loads — and operates them *as if*
 they were one large, dispatchable power plant.
 
+<figure style="margin:20px 0;border-radius:14px;overflow:hidden;border:1px solid rgba(20,20,20,.1);box-shadow:0 6px 20px rgba(20,20,20,.06);">
+<img src="https://asymmetrycomputing.com/assets/vpp-feeder.jpg" alt="A neighbourhood distribution feeder"
+ style="display:block;width:100%;height:300px;object-fit:cover;" onerror="this.closest('figure').style.display='none'">
+<figcaption style="font:500 12px/1.5 ui-monospace,monospace;color:#5f5f59;padding:9px 15px;background:#f6f8fa;border-top:1px solid rgba(20,20,20,.08);">
+Every home on this street shares <b style="color:#141414">one feeder</b> back to the grid. That shared wire is the constraint that makes coordinating the devices worth money.
+</figcaption>
+</figure>
+
 Every few minutes the electricity market publishes a price. When the price is **high**, the
 VPP wants its batteries to **discharge** (sell energy); when the price is **low**, it wants
 them to **charge** (buy energy to store for later). Doing this well, across a whole fleet,
@@ -530,6 +538,14 @@ home battery. The fleet here totals on the order of **100+ MW** of controllable 
 # ── §6 RESULTS ──────────────────────────────────────────────────────────────
 cells.append(md(r'''<a id="6"></a>
 ## 6 · Results
+
+<figure style="margin:14px 0 20px;border-radius:14px;overflow:hidden;border:1px solid rgba(20,20,20,.1);box-shadow:0 6px 20px rgba(20,20,20,.06);">
+<img src="https://asymmetrycomputing.com/assets/vpp-bess.jpg" alt="Grid-scale battery storage"
+ style="display:block;width:100%;height:300px;object-fit:cover;" onerror="this.closest('figure').style.display='none'">
+<figcaption style="font:500 12px/1.5 ui-monospace,monospace;color:#5f5f59;padding:9px 15px;background:#f6f8fa;border-top:1px solid rgba(20,20,20,.08);">
+The assets being coordinated: grid-scale battery enclosures. At 500,000 such devices, the dispatch problem is what PRISM solves in 15.8&nbsp;s.
+</figcaption>
+</figure>
 
 We report three results in order of importance: the **economic** question (is coordination
 worth anything?), the **scale** question (can it be solved at all?), and the **operational**
